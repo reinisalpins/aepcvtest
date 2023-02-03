@@ -38,7 +38,7 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'title' => 'required',
+            'title' => 'required|max:255|unique:posts',
             'text' => 'required',
         ]);
         $post = new Post;
@@ -81,6 +81,10 @@ class PostController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $this->validate($request, [
+            'title' => 'required|max:255|unique:posts,title,'.$id,
+            'text' => 'required',
+        ]);
         $post = Post::findOrFail($id);
         $post->title = $request->title;
         $post->text = $request->text;
@@ -96,6 +100,20 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $post = Post::findOrFail($id);
+        $post->delete();
+        return redirect("/post")->with('success', 'Ieraksts veiksmigi dzests');
+    }
+
+    public function search()
+    {
+        if(empty($_GET['meklet']))
+        {
+            $posts = Post::where('title', 'LIKE')->get();
+            return view('post.search', compact('posts'));
+        }
+        $search_text = $_GET['meklet'];
+        $posts = Post::where('title', 'LIKE', '%' . $search_text . '%')->get();
+        return view('post.search', compact('posts'));
     }
 }

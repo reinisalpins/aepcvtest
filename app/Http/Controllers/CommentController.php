@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Post;
 use App\Comment;
+use App\Blocked;
 
 class CommentController extends Controller
 {
@@ -37,7 +38,15 @@ class CommentController extends Controller
     public function store(Request $request, $postId)
     {
         $post = Post::findOrFail($postId);
-
+                
+        $this->validate($request, [
+            'email' => 'required|email',
+            'comment' => 'required',
+        ]);
+        
+    if (Blocked::where('email', $request->email)->exists()) {
+        return redirect()->back()->with('error', 'Sis lietotajs ir blokets no komentesanas');
+    }
         $comment = new Comment;
         $comment->email = $request->email;
         $comment->comment = $request->comment;
@@ -86,8 +95,19 @@ class CommentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
-        //
-    }
+public function destroy($postId, $email)
+{
+    Comment::where('email', $email)->delete();
+        $blockedEmail = new Blocked;
+        $blockedEmail->email = $email;
+        $blockedEmail->save();
+    return back();
+}
+
+public function unblock($email)
+{
+    Blocked::where('email', $email)->delete();
+    return back();
+}
+
 }

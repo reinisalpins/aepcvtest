@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('Visi', 'active')
+{{-- @section('Visi', 'active') --}}
 @section('content') 
 
 <div class="search-container">
@@ -9,7 +9,7 @@
     </form>
 </div>
 <div class="pievienot-container">
-    <h1>Visi ieraksti</h1>
+    <h1>Meklēšanas rezultāti</h1>
     <a href="{{ action('PostController@create') }}"><button class="pievienot">Pievienot jaunu ierakstu</button></a>
 </div>
 
@@ -37,4 +37,5 @@
     @endif
 </ul>
 </div>
+
 @endsection 
